@@ -4,12 +4,12 @@ import org.springframework.cloud.contract.spec.Contract
 
 Contract.make {
     request {
-        method POST()
+        method PUT()
         headers {
-            accept 'application/json'
-            contentType 'application/json'
+            accept "application/json"
+            contentType "application/json"
         }
-        urlPath("/api/v1/products") {
+        urlPath("/api/v1/products/fffe6ec2-7103-48b3-8e4f-3b58e43fb75a") {
             body([
                     name: value(
                             test("Notebook X11"),
@@ -43,12 +43,12 @@ Contract.make {
         }
     }
     response {
-        status 201
+        status 200
         headers {
             contentType 'application/json'
         }
         body([
-                id: anyUuid(),
+                id: fromRequest().path(3),
                 addedAt: anyIso8601WithOffset(),
                 name: fromRequest().body('$.name'),
                 brand: fromRequest().body('brand'),

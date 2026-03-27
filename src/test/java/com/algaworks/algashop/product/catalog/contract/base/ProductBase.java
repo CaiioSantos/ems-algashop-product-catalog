@@ -37,7 +37,7 @@ public class ProductBase {
 
     public static final UUID invalidProductId = UUID.fromString("21651a12-b126-4213-ac21-19f66ff4642e");
 
-    public static final UUID createdProductId = UUID.fromString("21651a12-b126-4213-ac21-19f66ff4642e");
+    public static final UUID createdProductId = UUID.fromString("f7c6843f-465c-476d-9a9b-4783bde4dc5e");
 
     @BeforeEach
     void setUp() {
