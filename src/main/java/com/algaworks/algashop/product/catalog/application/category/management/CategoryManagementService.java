@@ -1,6 +1,7 @@
 package com.algaworks.algashop.product.catalog.application.category.management;
 
 import com.algaworks.algashop.product.catalog.application.ResourceNotFoundException;
+import com.algaworks.algashop.product.catalog.domain.model.CategoryNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.category.Category;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryRepository;
 import jakarta.validation.Valid;
@@ -23,7 +24,7 @@ public class CategoryManagementService {
 
     public void update(UUID categoryId, CategoryInput input) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException());
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
         category.setName(input.getName());
         category.setEnabled(input.getEnabled());
         categoryRepository.save(category);
@@ -31,7 +32,7 @@ public class CategoryManagementService {
 
     public void disable(UUID categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException());
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
         category.setEnabled(false);
         categoryRepository.save(category);
     }

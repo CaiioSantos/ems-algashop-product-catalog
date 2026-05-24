@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,4 +22,14 @@ public class PageModel<T> {
     @Builder.Default
     private List<T> content = new ArrayList<>();
 
+    public static <T> PageModel<T> of(Page<T> page) {
+        return PageModel.<T>builder()
+                .number(page.getNumber())
+                .size(page.getSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .content(page.getContent())
+                .build();
+
+    }
 }

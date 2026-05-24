@@ -1,6 +1,8 @@
 package com.algaworks.algashop.product.catalog.presentation;
 
 import com.algaworks.algashop.product.catalog.application.ResourceNotFoundException;
+import com.algaworks.algashop.product.catalog.domain.model.DomainEntityNotFoundException;
+import com.algaworks.algashop.product.catalog.domain.model.DomainException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -42,13 +44,25 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return super.handleExceptionInternal(ex,problemDetail, headers, status, request);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ProblemDetail handleResourceNotFoundException(ResourceNotFoundException exception) {
+    @ExceptionHandler({DomainEntityNotFoundException.class, ResourceNotFoundException.class})
+    public ProblemDetail handleResourceNotFoundException(Exception exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         problemDetail.setTitle("Not found");
         problemDetail.setDetail(exception.getMessage());
         problemDetail.setType(URI.create("/errors/not-found"));
         return problemDetail;
+    }
+
+    @ExceptionHandler({DomainException.class, UnprocessableEntityException.class})
+    public ProblemDetail handleUnprocessableContent(Exception exception) {
+        {
+            ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_CONTENT);
+            problemDetail.setTitle("Unprocessable content");
+            problemDetail.setDetail(exception.getMessage());
+            problemDetail.setType(URI.create("/errors/unprocessable-content-"));
+            return problemDetail;
+        }
+
     }
 
 }

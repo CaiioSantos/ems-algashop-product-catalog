@@ -1,10 +1,10 @@
 package com.algaworks.algashop.product.catalog.infrastructure.persistence.category;
 
-import com.algaworks.algashop.product.catalog.application.ResourceNotFoundException;
 import com.algaworks.algashop.product.catalog.application.category.query.CategoryDetailOutput;
 import com.algaworks.algashop.product.catalog.application.category.query.CategoryQueryService;
 import com.algaworks.algashop.product.catalog.application.product.query.PageModel;
-import com.algaworks.algashop.product.catalog.application.utility.Mapper;
+import com.algaworks.algashop.product.catalog.application.utility.mapper.Mapper;
+import com.algaworks.algashop.product.catalog.domain.model.CategoryNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.category.Category;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
 
     @Override
     public CategoryDetailOutput findById(UUID categoryId) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException());
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException(categoryId));
         return mapper.convert(category, CategoryDetailOutput.class);
     }
 
