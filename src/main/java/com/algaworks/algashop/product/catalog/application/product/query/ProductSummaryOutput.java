@@ -26,6 +26,8 @@ public class ProductSummaryOutput {
 
     private String shortDescription;
 
+    private Float score;
+
     private String slug;
     private Boolean hasDiscount;
 

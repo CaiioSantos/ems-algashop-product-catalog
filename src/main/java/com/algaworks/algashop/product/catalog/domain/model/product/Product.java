@@ -9,10 +9,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.*;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
-import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
+import org.springframework.data.mongodb.core.mapping.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -22,14 +22,26 @@ import java.util.UUID;
 @Document(collection = "products")
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@NoArgsConstructor
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@CompoundIndex(name = "pidx_product_by_category_enabledTrue_salePrice",
+        def = "{'categoryId': 1, 'salePrice': 1}",
+        partialFilter = "{'enabled': true}")
+@CompoundIndex(name = "pidx_product_by_category_enabledTrue_addedAt",
+        def = "{'categoryId': 1, 'addedAt': -1}",
+        partialFilter = "{'enabled': true}")
 public class Product {
 
     @Id
     @EqualsAndHashCode.Include
     private UUID id;
+
+    @TextIndexed(weight = 1)
     private String name;
+
+    @Indexed(name = "idx_product_by_brand")
     private String brand;
+
+    @TextIndexed(weight = 5)
     private String description;
     private Integer quantityInStock = 0;
     private Boolean enabled;
@@ -51,11 +63,15 @@ public class Product {
     @LastModifiedBy
     private UUID lastModifiedByUserId;
 
+
     @DocumentReference
     @Field(name = "categoryId")
     private Category category;
 
     private Integer discountPercentageRounded;
+
+    @TextScore
+    private Float score;
 
     @Builder
     public Product(String name, String brand, String description, Boolean enabled, BigDecimal regularPrice,

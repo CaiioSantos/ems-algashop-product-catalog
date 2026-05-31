@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 
 @WebMvcTest(controllers = ProductController.class)
@@ -74,7 +75,7 @@ public class ProductBase {
     }
 
     private void mockCreateProduct() {
-        Mockito.when(productManagementApplicationService.create(Mockito.any(ProductInput.class)))
+        Mockito.when(productManagementApplicationService.create(any(ProductInput.class)))
                 .thenReturn(createdProductId);
 
         Mockito.when(productQueryService.findById(createdProductId))
@@ -82,8 +83,7 @@ public class ProductBase {
     }
 
     private void mockFilterProducts() {
-        Mockito.when(productQueryService.filter(
-                        Mockito.anyInt(), Mockito.anyInt()))
+        Mockito.when(productQueryService.filter(any()))
                 .then((answer)-> {
                     Integer size = answer.getArgument(0);
 

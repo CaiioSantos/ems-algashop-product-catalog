@@ -21,6 +21,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+
 @WebMvcTest(controllers = CategoryController.class)
 public class CategoryBase {
 
@@ -43,7 +45,7 @@ public class CategoryBase {
 
         RestAssuredMockMvc.enableLoggingOfRequestAndResponseIfValidationFails();
 
-        Mockito.when(categoryQueryService.filter(Mockito.anyInt(), Mockito.anyInt()))
+        Mockito.when(categoryQueryService.filter(any()))
                 .then((answer)-> {
                     Integer size = answer.getArgument(0);
                     return PageModel.<CategoryDetailOutput>builder()
