@@ -1,5 +1,6 @@
 package com.algaworks.algashop.product.catalog.application.product.query;
 
+import com.algaworks.algashop.product.catalog.infrastructure.utility.Slugfier;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,10 +29,11 @@ public class ProductSummaryOutput {
 
     private Float score;
 
-    private String slug;
     private Boolean hasDiscount;
 
     private Integer quantityInStock;
     private Integer discountPercentageRounded;
-
+    public String getSlug() {
+        return Slugfier.slugify(this.getName());
+    }
 }
