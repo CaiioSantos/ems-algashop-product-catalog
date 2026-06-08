@@ -12,12 +12,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductCategory {
-
     private UUID id;
     private String name;
     private Boolean enabled;
 
-    public static ProductCategory of(Category category){
+    public static ProductCategory of(Category category) {
         return new ProductCategory(category.getId(), category.getName(), category.getEnabled());
     }
 }
