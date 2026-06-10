@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.*;
+import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
@@ -29,7 +30,7 @@ import java.util.UUID;
 @CompoundIndex(name = "pidx_product_by_category_enabledTrue_addedAt",
         def = "{'category.id': 1, 'addedAt': -1}",
         partialFilter = "{'enabled': true}")
-public class Product {
+public class Product extends AbstractAggregateRoot<Product> {
 
     @Id
     @EqualsAndHashCode.Include
@@ -98,33 +99,6 @@ public class Product {
     public void setDescription(String description) {
         this.description = description;
     }
-    public void setRegularPrice(BigDecimal regularPrice) {
-        Objects.requireNonNull(regularPrice);
-        if (regularPrice.signum() == -1) {
-            throw new IllegalArgumentException();
-        }
-        if (this.salePrice == null) {
-            this.salePrice = regularPrice;
-        }else if (regularPrice.compareTo(this.salePrice) < 0) {
-            throw new DomainException("Regular price cannot be lower than sale price");
-        }
-        this.regularPrice = regularPrice;
-        this.calculateDiscountPercentageRounded();
-    }
-
-    public void setSalePrice(BigDecimal salePrice) {
-        Objects.requireNonNull(salePrice);
-        if (salePrice.signum() == -1) {
-            throw new IllegalArgumentException();
-        }
-        if (this.regularPrice == null) {
-            this.regularPrice = salePrice;
-        }else if (this.regularPrice.compareTo(salePrice) < 0) {
-            throw new DomainException("Sale price cannot be higher than regular price");
-        }
-        this.salePrice = salePrice;
-        this.calculateDiscountPercentageRounded();
-    }
 
     public void setCategory(Category category) {
         Objects.requireNonNull(category);
@@ -153,6 +127,63 @@ public class Product {
         return getDiscountPercentageRounded() != null && getDiscountPercentageRounded() > 0;
     }
 
+    public void changePrice(BigDecimal regularPrice,BigDecimal salePrice) {
+        Objects.requireNonNull(regularPrice);
+        Objects.requireNonNull(salePrice);
+
+        BigDecimal oldRegularPrice = this.regularPrice;
+        BigDecimal oldSaleprice = this.salePrice;
+
+        boolean wasOnSale = getHasDiscount();
+
+        if (this.regularPrice.compareTo(salePrice) < 0) {
+            throw new DomainException("Sale price cannot be higher than regular price");
+        }
+
+        setRegularPrice(regularPrice);
+        setSalePrice(salePrice);
+
+        if (pricesDidNotChange(oldRegularPrice,oldSaleprice)){
+
+        }
+        registerPriceChangedEvent(oldRegularPrice, oldSaleprice);
+
+        if (isNewlyOnSale(wasOnSale)) {
+            registerProductPlacedOnSaleEvent();
+        }
+
+    }
+
+    private boolean pricesDidNotChange(BigDecimal oldRegularPrice, BigDecimal oldSaleprice) {
+    return Objects.equals(this.regularPrice, oldRegularPrice) && Objects.equals(this.salePrice, oldSaleprice);
+    }
+
+    private void registerPriceChangedEvent(BigDecimal oldRegularPrice, BigDecimal oldSaleprice) {
+        super.registerEvent(
+                ProductPriceChangedEvent.builder()
+                        .productId(this.id)
+                        .newSalePrice(this.salePrice)
+                        .newRegularPrice(this.regularPrice)
+                        .oldRegularPrice(oldRegularPrice)
+                        .oldSalePrice(oldSaleprice)
+                        .build()
+        );
+    }
+
+    private boolean isNewlyOnSale(boolean wasOnSale) {
+        return getHasDiscount() && !wasOnSale;
+    }
+
+    private void registerProductPlacedOnSaleEvent() {
+        super.registerEvent(
+                ProductPlacedOnSaleEvent.builder()
+                        .productId(this.id)
+                        .regularPrice(this.regularPrice)
+                        .salePrice(this.salePrice)
+                        .build()
+        );
+    }
+
     private void setId(UUID id) {
      Objects.requireNonNull(id);
         this.id = id;
@@ -176,6 +207,30 @@ public class Product {
                 .multiply(BigDecimal.valueOf(100))
                 .setScale(0, BigDecimal.ROUND_HALF_UP)
                 .intValue();
+    }
+
+    private void setRegularPrice(BigDecimal regularPrice) {
+        Objects.requireNonNull(regularPrice);
+        if (regularPrice.signum() == -1) {
+            throw new IllegalArgumentException();
+        }
+        if (this.salePrice == null) {
+            this.salePrice = regularPrice;
+        }else if (regularPrice.compareTo(this.salePrice) < 0) {
+            throw new DomainException("Regular price cannot be lower than sale price");
+        }
+        this.regularPrice = regularPrice;
+        this.calculateDiscountPercentageRounded();
+    }
+
+    private void setSalePrice(BigDecimal salePrice) {
+        Objects.requireNonNull(salePrice);
+        if (salePrice.signum() == -1) {
+            throw new IllegalArgumentException();
+        }
+
+        this.salePrice = salePrice;
+        this.calculateDiscountPercentageRounded();
     }
 
 

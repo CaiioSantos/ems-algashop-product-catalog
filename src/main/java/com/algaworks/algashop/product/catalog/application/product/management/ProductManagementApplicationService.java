@@ -51,9 +51,9 @@ public class ProductManagementApplicationService {
         product.setName(input.getName());
         product.setBrand(input.getBrand());
         product.setDescription(input.getDescription());
-        product.setRegularPrice(input.getRegularPrice());
-        product.setSalePrice(input.getSalePrice());
         product.setEnabled(input.getEnabled());
+
+        product.changePrice(input.getRegularPrice(), input.getSalePrice());
     }
 
     public void disable(UUID productId) {
