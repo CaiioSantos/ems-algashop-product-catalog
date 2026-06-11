@@ -82,6 +82,8 @@ public class Product extends AbstractAggregateRoot<Product> {
         this.setRegularPrice(regularPrice);
         this.setSalePrice(salePrice);
         this.setCategory(category);
+
+        registerProductAddedEvent();
     }
 
     public void setName(String name) {
@@ -108,7 +110,18 @@ public class Product extends AbstractAggregateRoot<Product> {
 
     public void setEnabled(Boolean enabled) {
         Objects.requireNonNull(enabled);
+        Boolean wasEnabled = this.enabled;
         this.enabled = enabled;
+        if (wasEnabled != null && wasEnabled && !this.getEnabled()) {
+            this.registerEvent(ProductDelistedEvent.builder()
+                    .productId(this.getId())
+                    .build());
+        } else if (wasEnabled != null && !wasEnabled && this.getEnabled()) {
+            this.registerEvent(ProductListedEvent.builder()
+                    .productId(this.getId())
+                    .build());
+        }
+
     }
 
     public void disable() {
@@ -144,7 +157,7 @@ public class Product extends AbstractAggregateRoot<Product> {
         setSalePrice(salePrice);
 
         if (pricesDidNotChange(oldRegularPrice,oldSaleprice)){
-
+            return;
         }
         registerPriceChangedEvent(oldRegularPrice, oldSaleprice);
 
@@ -184,6 +197,30 @@ public class Product extends AbstractAggregateRoot<Product> {
         );
     }
 
+    public void registerProductAddedEvent() {
+        super.registerEvent(
+                ProductAddedEvent.builder()
+                        .productId(this.id)
+                        .build()
+        );
+    }
+
+    private void statusProductDelistedEvent() {
+        super.registerEvent(
+                ProductDelistedEvent.builder()
+                        .productId(this.id)
+                        .build()
+        );
+    }
+
+    private void statusProductListedEvent() {
+        super.registerEvent(
+                ProductListedEvent.builder()
+                        .productId(this.id)
+                        .build()
+        );
+    }
+
     private void setId(UUID id) {
      Objects.requireNonNull(id);
         this.id = id;
@@ -214,11 +251,7 @@ public class Product extends AbstractAggregateRoot<Product> {
         if (regularPrice.signum() == -1) {
             throw new IllegalArgumentException();
         }
-        if (this.salePrice == null) {
-            this.salePrice = regularPrice;
-        }else if (regularPrice.compareTo(this.salePrice) < 0) {
-            throw new DomainException("Regular price cannot be lower than sale price");
-        }
+
         this.regularPrice = regularPrice;
         this.calculateDiscountPercentageRounded();
     }
