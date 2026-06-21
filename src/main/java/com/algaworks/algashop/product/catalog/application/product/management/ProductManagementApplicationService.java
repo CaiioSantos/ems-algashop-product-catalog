@@ -7,9 +7,11 @@ import com.algaworks.algashop.product.catalog.domain.model.category.Category;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryRepository;
 import com.algaworks.algashop.product.catalog.domain.model.product.Product;
 import com.algaworks.algashop.product.catalog.domain.model.product.ProductRepository;
+import com.algaworks.algashop.product.catalog.domain.model.product.StockService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -19,6 +21,8 @@ public class ProductManagementApplicationService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+
+    private final StockService stockService;
 
     public UUID create(ProductInput input) {
         Product product  = this.mapToproduct(input);
@@ -45,6 +49,17 @@ public class ProductManagementApplicationService {
         this.updateproduct(product, input);
         product.setCategory(category);
         this.productRepository.save(product);
+    }
+
+    @Transactional
+    public void restock(UUID productId,int quantity) {
+        Product product = findProduct(productId);
+        stockService.restock(product, quantity);
+    }
+    @Transactional
+    public void withdraw(UUID productId,int quantity) {
+        Product product = findProduct(productId);
+        stockService.withdraw(product, quantity);
     }
 
     private void updateproduct(Product product, ProductInput input) {

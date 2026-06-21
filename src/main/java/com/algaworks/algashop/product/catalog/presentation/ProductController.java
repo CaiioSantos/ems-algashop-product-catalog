@@ -61,4 +61,16 @@ public class ProductController {
     public  void disable(@PathVariable UUID productId){
         productManagementApplicationService.disable(productId);
     }
+
+    @PostMapping("/{productId}/restock")
+    @ResponseStatus(HttpStatus.OK)
+    public void restock(@PathVariable UUID productId, @RequestBody @Valid ProductQuantityModel productQuantityModel) {
+        productManagementApplicationService.restock(productId,productQuantityModel.getQuantity());
+    }
+
+    @PostMapping("/{productId}/withdraw")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void withdraw(@PathVariable UUID productId, @RequestBody @Valid ProductQuantityModel productQuantityModel) {
+        productManagementApplicationService.withdraw(productId,productQuantityModel.getQuantity());
+    }
 }
