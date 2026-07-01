@@ -1,5 +1,6 @@
 package com.algaworks.algashop.product.catalog.domain.model.product;
 
+import com.algaworks.algashop.product.catalog.TestContainerMongoDBConfig;
 import com.algaworks.algashop.product.catalog.infrastructure.persistence.MongoConfig;
 import com.algaworks.algashop.product.catalog.infrastructure.persistence.dataload.DataLoadProperties;
 import com.algaworks.algashop.product.catalog.infrastructure.persistence.dataload.DataLoader;
@@ -12,19 +13,19 @@ import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @DataMongoTest
-@EnableMongoRepositories(basePackageClasses = ProductRepository.class)
 @Import({
         MongoConfig.class,
         QuantityInStockAdjustmentMongoDBImpl.class,
         DataLoader.class,
-        DataLoadProperties.class
+        DataLoadProperties.class,
+        TestContainerMongoDBConfig.class
 })
+@Transactional
 class QuantityInStockAdjustmentIT {
 
 
@@ -37,15 +38,10 @@ class QuantityInStockAdjustmentIT {
     @Autowired
     private DataLoader dataLoader;
 
-    private static UUID existingProduct = UUID.fromString("946cea3b-d11d-4f11-b88d-3089b4e74087");
-
-    @BeforeEach
-    public void beforeEach() throws Exception {
-        dataLoader.run(new DefaultApplicationArguments());
-    }
+    private static final UUID existingProduct = UUID.fromString("946cea3b-d11d-4f11-b88d-3089b4e74087");
 
     @Test
-    public void shouldIncreaseQuantity() {
+     void shouldIncreaseQuantity() {
         Product product = productRepository.findById(existingProduct).orElseThrow();
 
         quantityInStockAdjustment.increase(existingProduct, 25);
@@ -58,7 +54,7 @@ class QuantityInStockAdjustmentIT {
     }
 
     @Test
-    public void shouldDecreaseQuantity() {
+     void shouldDecreaseQuantity() {
         Product product = productRepository.findById(existingProduct).orElseThrow();
 
         quantityInStockAdjustment.decrease(existingProduct, 25);
@@ -67,11 +63,11 @@ class QuantityInStockAdjustmentIT {
         Product productUpdated = productRepository.findById(existingProduct).orElseThrow();
 
         Assertions.assertThat(product.getQuantityInStock()).isEqualTo(50);
-        Assertions.assertThat(productUpdated.getQuantityInStock()).isEqualTo(0);
+        Assertions.assertThat(productUpdated.getQuantityInStock()).isZero();
     }
 
     @Test
-    public void shouldNotDecreaseQuantity() {
+     void shouldNotDecreaseQuantity() {
         Assertions.assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(()-> quantityInStockAdjustment.decrease(existingProduct, 100));
         Product product = productRepository.findById(existingProduct).orElseThrow();
@@ -79,7 +75,7 @@ class QuantityInStockAdjustmentIT {
     }
 
     @Test
-    public void shpuldCalculateResult() {
+     void shouldCalculateResult() {
         Product product = productRepository.findById(existingProduct).orElseThrow();
         var result = quantityInStockAdjustment.decrease(product.getId(), 40);
 

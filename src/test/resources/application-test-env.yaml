@@ -1,3 +1,0 @@
-spring:
-  mongodb:
-    uri: mongodb://root:algashop@localhost:27017/product_catalog_test?authSource=admin
