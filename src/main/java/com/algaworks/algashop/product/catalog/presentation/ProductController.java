@@ -7,10 +7,13 @@ import com.algaworks.algashop.product.catalog.application.product.query.*;
 import com.algaworks.algashop.product.catalog.domain.model.CategoryNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -34,8 +37,14 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ProductDetailOutput findById(@PathVariable UUID productId) {
-        return productQueryService.findById(productId);
+    public ResponseEntity<ProductDetailOutput> findById(@PathVariable UUID productId) {
+        var product = productQueryService.findById(productId);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(10, TimeUnit.MINUTES))
+                .eTag("product:id:" + product.getId() + ":version:" + product.getVersion())
+                .lastModified(product.getUpdatedAt().toInstant())
+                .body(product);
+
     }
 
     @GetMapping
