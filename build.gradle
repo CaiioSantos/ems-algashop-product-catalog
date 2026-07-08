@@ -7,7 +7,6 @@ plugins {
 	id 'org.springframework.cloud.contract' version '5.0.2'
 	id 'org.asciidoctor.jvm.convert' version '4.0.5'
 }
-
 group = 'com.algaworks.algashop'
 version = '0.0.1-SNAPSHOT'
 
@@ -15,13 +14,6 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(25)
 	}
-}
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	mockitoAgent
 }
 
 idea {
@@ -46,15 +38,16 @@ publishing {
 }
 
 ext {
-	set('springCloudVersion', "2025.1.1")
-	set('snippetsDir', file("build/generated-snippets"))
+    springCloudVersion = "2025.1.1"
+    snippetsDir = file("build/generated-snippets")
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	asciidoctorExt
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    asciidoctorExt
+    mockitoAgent {transitive = false}
 }
 
 dependencies {

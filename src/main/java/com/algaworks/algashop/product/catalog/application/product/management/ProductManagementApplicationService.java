@@ -1,13 +1,17 @@
 package com.algaworks.algashop.product.catalog.application.product.management;
 
 import com.algaworks.algashop.product.catalog.application.ResourceNotFoundException;
+import com.algaworks.algashop.product.catalog.application.product.query.ProductDetailOutput;
 import com.algaworks.algashop.product.catalog.domain.model.CategoryNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.ProductNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.category.Category;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryRepository;
 import com.algaworks.algashop.product.catalog.domain.model.product.*;
+import com.algaworks.algashop.product.catalog.infrastructure.utility.mapper.Mapper;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +27,12 @@ public class ProductManagementApplicationService {
 
     private final StockService stockService;
 
-    public UUID create(ProductInput input) {
+    private final Mapper mapper;
+    @CachePut(value = "algashop:products:v1", key = "#result.id", condition = "#input.enabled == true")
+    public ProductDetailOutput create(ProductInput input) {
         Product product  = this.mapToproduct(input);
             this.productRepository.save(product);
-        return product.getId();
+        return this.mapper.convert(product, ProductDetailOutput.class);
     }
 
     private Product mapToproduct(ProductInput input) {
@@ -42,12 +48,15 @@ public class ProductManagementApplicationService {
                 .build();
     }
 
-    public void update(UUID productId, ProductInput input) {
+    @CachePut(value = "algashop:products:v1", key = "#result.id", condition = "#input.enabled == true")
+    @CacheEvict( cacheNames = "algashop:products:v1", key = "#productId", condition = "#input.enabled == false")
+    public ProductDetailOutput update(UUID productId, ProductInput input) {
         Product product = this.findProduct(productId);
         Category category = this.findCategory(input.getCategoryId());
         this.updateproduct(product, input);
         product.setCategory(category);
         this.productRepository.save(product);
+        return this.mapper.convert(product, ProductDetailOutput.class);
     }
 
     @Transactional
@@ -71,6 +80,7 @@ public class ProductManagementApplicationService {
         product.changePrice(input.getRegularPrice(), input.getSalePrice());
     }
 
+    @CacheEvict( cacheNames = "algashop:products:v1", key = "#productId")
     public void disable(UUID productId) {
         Product product = this.findProduct(productId);
         product.disable();
@@ -78,6 +88,7 @@ public class ProductManagementApplicationService {
 
     }
 
+    @CacheEvict( cacheNames = "algashop:products:v1", key = "#productId")
     public void enable(UUID productId) {
         Product product = this.findProduct(productId);
         product.enable();
