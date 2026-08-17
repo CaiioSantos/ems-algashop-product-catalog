@@ -1,6 +1,6 @@
 package com.algaworks.algashop.product.catalog.application.product.query;
 
-import com.algaworks.algashop.product.catalog.infrastructure.utility.mapper.SortablePageFilter;
+import com.algaworks.algashop.product.catalog.application.utility.mapper.SortablePageFilter;
 import lombok.*;
 import org.springframework.data.domain.Sort;
 

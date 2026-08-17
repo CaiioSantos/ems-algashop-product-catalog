@@ -17,8 +17,9 @@ import org.springframework.data.mongodb.core.mapping.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+
+import static java.util.Collections.unmodifiableSet;
 
 @Document(collection = "products")
 @Getter
@@ -70,6 +71,10 @@ public class Product extends AbstractAggregateRoot<Product> {
 
     @TextScore
     private Float score;
+
+    private Image mainImage;
+
+    private Set<Image> images = new HashSet<>();;
 
     @Builder
     public Product(String name, String brand, String description, Boolean enabled, BigDecimal regularPrice,
@@ -138,6 +143,46 @@ public class Product extends AbstractAggregateRoot<Product> {
 
     public boolean getHasDiscount() {
         return getDiscountPercentageRounded() != null && getDiscountPercentageRounded() > 0;
+    }
+
+    public Set<Image> getImages() {
+        return Collections.unmodifiableSet(this.images);
+    }
+
+    public Optional<Image> getImage(UUID imageId) {
+        Objects.requireNonNull(imageId);
+        return this.images.stream().filter(image -> image.getId().equals(imageId)).findFirst();
+    }
+
+    public void changeMainImage(UUID imageId) {
+        Objects.requireNonNull(imageId);
+        Image image = findImageById(imageId);
+        setMainImage(image);
+    }
+
+    public UUID addImage(String imageName) {
+        Objects.requireNonNull(imageName);
+        Image image = new Image(imageName);
+        this.images.add(image);
+        if (this.mainImage == null) {
+            this.setMainImage(image);
+        }
+        return image.getId();
+    }
+
+    private Image findImageById(UUID imageId) {
+        return getImage(imageId)
+                .orElseThrow(() -> new DomainException(
+                        String.format("Image of id %s was not found on product %s", imageId, id)));
+    }
+
+    public void removeImage(UUID imageId) {
+        Objects.requireNonNull(imageId);
+        Image image = findImageById(imageId);
+        this.images.remove(image);
+        if (image.equals(this.mainImage)) {
+            this.setMainImage(this.images.stream().findFirst().orElse(null));
+        }
     }
 
     public void changePrice(BigDecimal regularPrice,BigDecimal salePrice) {
@@ -232,6 +277,10 @@ public class Product extends AbstractAggregateRoot<Product> {
             throw new IllegalArgumentException();
         }
         this.quantityInStock = quantityInStock;
+    }
+
+    private void setMainImage(Image mainImage) {
+        this.mainImage = mainImage;
     }
 
     private void calculateDiscountPercentageRounded() {

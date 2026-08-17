@@ -1,13 +1,9 @@
 package com.algaworks.algashop.product.catalog.application.category.query;
 
-import com.algaworks.algashop.product.catalog.infrastructure.utility.mapper.SortablePageFilter;
+import com.algaworks.algashop.product.catalog.application.utility.mapper.SortablePageFilter;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.domain.Sort;
-
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor

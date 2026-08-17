@@ -7,7 +7,7 @@ import com.algaworks.algashop.product.catalog.application.product.query.PageMode
 import com.algaworks.algashop.product.catalog.domain.model.CategoryNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.category.Category;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryRepository;
-import com.algaworks.algashop.product.catalog.infrastructure.utility.mapper.Mapper;
+import com.algaworks.algashop.product.catalog.application.utility.mapper.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;

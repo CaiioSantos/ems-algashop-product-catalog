@@ -1,13 +1,12 @@
 package com.algaworks.algashop.product.catalog.application.product.management;
 
-import com.algaworks.algashop.product.catalog.application.ResourceNotFoundException;
 import com.algaworks.algashop.product.catalog.application.product.query.ProductDetailOutput;
 import com.algaworks.algashop.product.catalog.domain.model.CategoryNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.ProductNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.category.Category;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryRepository;
 import com.algaworks.algashop.product.catalog.domain.model.product.*;
-import com.algaworks.algashop.product.catalog.infrastructure.utility.mapper.Mapper;
+import com.algaworks.algashop.product.catalog.application.utility.mapper.Mapper;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;

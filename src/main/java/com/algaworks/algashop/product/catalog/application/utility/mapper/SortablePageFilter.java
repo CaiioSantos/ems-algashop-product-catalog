@@ -1,4 +1,4 @@
-package com.algaworks.algashop.product.catalog.infrastructure.utility.mapper;
+package com.algaworks.algashop.product.catalog.application.utility.mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

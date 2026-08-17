@@ -2,9 +2,8 @@ package com.algaworks.algashop.product.catalog.infrastructure.persistence.mapper
 
 
 import com.algaworks.algashop.product.catalog.application.product.query.ProductDetailOutput;
-import com.algaworks.algashop.product.catalog.application.product.query.ProductSummaryOutput;
 import com.algaworks.algashop.product.catalog.infrastructure.utility.Slugfier;
-import com.algaworks.algashop.product.catalog.infrastructure.utility.mapper.Mapper;
+import com.algaworks.algashop.product.catalog.application.utility.mapper.Mapper;
 import com.algaworks.algashop.product.catalog.domain.model.product.Product;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;

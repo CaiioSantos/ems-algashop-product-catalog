@@ -1,11 +1,10 @@
 package com.algaworks.algashop.product.catalog.infrastructure.persistence.product;
 
 import com.algaworks.algashop.product.catalog.application.product.query.*;
-import com.algaworks.algashop.product.catalog.infrastructure.utility.mapper.Mapper;
+import com.algaworks.algashop.product.catalog.application.utility.mapper.Mapper;
 import com.algaworks.algashop.product.catalog.domain.model.ProductNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.product.Product;
 import com.algaworks.algashop.product.catalog.domain.model.product.ProductRepository;
-import com.mongodb.internal.operation.AggregateOperation;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -20,10 +19,8 @@ import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 @RequiredArgsConstructor
