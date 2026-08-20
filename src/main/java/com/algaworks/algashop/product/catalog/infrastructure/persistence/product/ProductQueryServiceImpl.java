@@ -74,16 +74,18 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
         operations.addAll(Arrays.asList(
                 sort(sortWith(filter)),
-                projectionForSummary(),
                 skip(pageRequest.getOffset()),
                 limit(filter.getSize())
         ));
 
         Aggregation aggregation = newAggregation(operations);
 
-        List<ProductSummaryOutput> productSummaryOutputs = mongoOperations
-                .aggregate(aggregation, Product.class, ProductSummaryOutput.class)
+        List<Product> products = mongoOperations
+                .aggregate(aggregation, Product.class, Product.class)
                 .getMappedResults();
+        List<ProductSummaryOutput> productSummaryOutputs = products.stream()
+                .map(product -> this.mapper.convert(product, ProductSummaryOutput.class))
+                .toList();
 
         int totalPages = (int) Math.ceil((double) totalElements / (double) filter.getSize());
 
@@ -94,15 +96,6 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                 .totalElements(totalElements)
                 .totalPages(totalPages)
                 .build();
-    }
-
-    private ProjectionOperation projectionForSummary() {
-        return project(ProductDetailOutput.class)
-                .andExpression("salePrice < regularPrice").as("hasDiscount")
-                .andExpression("quantityInStock > 0").as("inStock")
-                .and(StringOperators.Substr.valueOf("description")
-                        .substring(0, 50)).as("shortDescription");
-
     }
 
     private Optional<Criteria> buildCriteria(ProductFilter filter) {
