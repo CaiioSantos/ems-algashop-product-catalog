@@ -33,6 +33,7 @@ public class UploadRequestApplicationService {
                 .contentType(mediaType)
                 .fileName(UUID.randomUUID() + "." + extension)
                 .expiresIn(Duration.ofMinutes(5))
+                .allowPublicRead(true)
                 .build();
 
         URL preSignedUrl = storageProvider.requestUploadUrl(fileReference);

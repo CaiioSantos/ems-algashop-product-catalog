@@ -14,9 +14,10 @@ public class FileReference {
     private MediaType contentType;
     private Long contentLength;
     private Duration expiresIn;
+    private boolean allowPublicRead;
 
     @Builder
-    public FileReference(String fileName, MediaType contentType, Long contentLength, Duration expiresIn) {
+    public FileReference(String fileName, MediaType contentType, Long contentLength, Duration expiresIn, boolean allowPublicRead) {
         Objects.requireNonNull(fileName);
         Objects.requireNonNull(contentType);
         Objects.requireNonNull(contentLength);
@@ -30,6 +31,7 @@ public class FileReference {
         this.contentType = contentType;
         this.contentLength = contentLength;
         this.expiresIn = expiresIn;
+        this.allowPublicRead = allowPublicRead;
 
     }
 }
