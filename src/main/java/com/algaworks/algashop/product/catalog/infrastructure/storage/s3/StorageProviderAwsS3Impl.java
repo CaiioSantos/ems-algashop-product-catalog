@@ -1,7 +1,9 @@
-package com.algaworks.algashop.product.catalog.infrastructure.storage.fake;
+package com.algaworks.algashop.product.catalog.infrastructure.storage.s3;
 
 import com.algaworks.algashop.product.catalog.application.storage.FileReference;
 import com.algaworks.algashop.product.catalog.application.storage.StorageProvider;
+import io.awspring.cloud.s3.S3Template;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +12,20 @@ import java.net.URL;
 import java.util.UUID;
 
 @Component
-public class StorageProviderFakeImpl implements StorageProvider {
+@RequiredArgsConstructor
+public class StorageProviderAwsS3Impl implements StorageProvider {
+
+    private final StorageProviderAwsS3properties properties;
+    private final S3Template s3Template;
+
+    @Override
+    public boolean healthCheck() {
+        try {
+            return s3Template.bucketExists(properties.getBucketName());
+        } catch (Exception ex) {
+            return false;
+        }
+    }
 
     @Override
     @SneakyThrows
