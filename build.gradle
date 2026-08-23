@@ -64,6 +64,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.21.0'
     implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}")
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -77,6 +78,7 @@ dependencies {
     testImplementation 'org.testcontainers:testcontainers-mongodb'
     testImplementation 'org.springframework.boot:spring-boot-starter-cache-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-redis-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test'
 	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
