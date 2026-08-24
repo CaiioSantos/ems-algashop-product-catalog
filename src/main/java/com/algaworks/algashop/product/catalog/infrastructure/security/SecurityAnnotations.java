@@ -34,4 +34,22 @@ public class SecurityAnnotations {
     public @interface CanRestockProducts {
     }
 
+    @Target({
+            java.lang.annotation.ElementType.METHOD,
+            java.lang.annotation.ElementType.TYPE
+    })
+    @Retention(RetentionPolicy.RUNTIME)
+    @PreAuthorize("hasAuthority('SCOPE_categories:read')")
+    public @interface CanReadCategories {
+    }
+
+    @Target({
+            java.lang.annotation.ElementType.METHOD,
+            java.lang.annotation.ElementType.TYPE
+    })
+    @Retention(RetentionPolicy.RUNTIME)
+    @PreAuthorize("hasAuthority('SCOPE_categories:write')")
+    public @interface CanWriteCategories {
+    }
+
 }
