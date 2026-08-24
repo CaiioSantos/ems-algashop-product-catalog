@@ -21,6 +21,11 @@ spring:
       s3:
         enabled: true
         path-style-access-enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://algashop-authorization-server:8081
 logging:
   level:
     org.mongodb.driver.protocol.command: DEBUG
